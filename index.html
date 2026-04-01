@@ -1192,7 +1192,7 @@ body::after{
         <a href="https://www.instagram.com/lightsight_official/" target="_blank" class="contact-social"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg> Instagram</a>
       </div>
     </div>
-    <form class="contact-form" onsubmit="handleSubmit(event)">
+    <form class="contact-form" id="contactForm">
       <div class="form-row d1" data-reveal>
         <div class="form-field">
           <label>Name *</label>
@@ -1203,6 +1203,7 @@ body::after{
           <input type="email" name="email" required>
         </div>
       </div>
+
       <div class="form-row d2" data-reveal>
         <div class="form-field">
           <label>Telefon</label>
@@ -1213,10 +1214,12 @@ body::after{
           <input type="date" name="date" required>
         </div>
       </div>
+
       <div class="form-field d3" data-reveal>
         <label>Nachricht *</label>
         <textarea name="message" required placeholder="Erzählt uns von eurem Event..."></textarea>
       </div>
+
       <button type="submit" class="btn btn-white btn-send d4" data-reveal>Anfrage senden</button>
     </form>
   </div>
@@ -1321,12 +1324,61 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
 });
 
 /*═══ FORM ═══*/
-function handleSubmit(e){
+const contactForm = document.querySelector('.contact-form');
+
+contactForm.addEventListener('submit', function(e) {
   e.preventDefault();
-  const b=e.target.querySelector('.btn-send');
-  b.textContent='GESENDET ✓';
-  b.style.background='#2a9d4e';b.style.color='#fff';
-  setTimeout(()=>{b.textContent='ANFRAGE SENDEN';b.style.background='';b.style.color='';e.target.reset()},3000);
+
+  const form = e.target;
+  const button = form.querySelector('.btn-send');
+  const formData = new FormData(form);
+
+  button.textContent = 'SENDET...';
+  button.disabled = true;
+
+  fetch('senden.php', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => {
+    if (response.ok) {
+      button.textContent = 'GESENDET ✓';
+      button.style.background = '#2a9d4e';
+      button.style.color = '#fff';
+
+      setTimeout(() => {
+        button.textContent = 'ANFRAGE SENDEN';
+        button.style.background = '';
+        button.style.color = '';
+        button.disabled = false;
+        form.reset();
+      }, 3000);
+    } else {
+      // Wenn der Server antwortet, aber mit einem Fehler (z.B. 500)
+      handleFormError(button);
+    }
+  })
+  .catch(error => {
+    // Wenn gar keine Verbindung zustande kommt
+    handleFormError(button);
+  });
+});
+
+// Hilfsfunktion für den Fehlerfall
+function handleFormError(button) {
+  button.textContent = 'FEHLER!';
+  button.style.background = '#e74c3c';
+  button.style.color = '#fff';
+
+  // Popup öffnen
+  openErrorPopup();
+
+  setTimeout(() => {
+    button.textContent = 'ANFRAGE SENDEN';
+    button.disabled = false;
+    button.style.background = '';
+    button.style.color = '';
+  }, 4000);
 }
 
 /*═══ MODAL ═══*/
@@ -1368,6 +1420,27 @@ document.querySelectorAll('.about-highlight-num').forEach(el => {
   }, { threshold: 0.5 });
   obs.observe(el);
 });
+function openErrorPopup() {
+  document.getElementById('errorPopup').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeErrorPopup() {
+  document.getElementById('errorPopup').classList.remove('active');
+  document.body.style.overflow = '';
+}
 </script>
+<div class="modal-overlay" id="errorPopup">
+  <div class="modal" style="text-align: center; max-width: 450px; border: 1px solid rgba(231, 76, 60, 0.3);">
+    <button class="modal-close" onclick="closeErrorPopup()">✕</button>
+    <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+    <h2 style="color: #e74c3c;">Fehler</h2>
+    <p style="font-size: 1rem; color: #fff; line-height: 1.6;">
+      Fehler beim Senden der Anfrage.<br>
+      Bitte kontaktieren Sie die unten genannte Mail oder Telefonnummer ohne das Formular.
+    </p>
+    <button class="btn btn-ghost" onclick="closeErrorPopup()" style="margin-top: 1.5rem; padding: 0.8rem 2rem;">Schließen</button>
+  </div>
+</div>
 </body>
 </html>

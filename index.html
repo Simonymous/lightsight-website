@@ -354,6 +354,34 @@ body::after{
   border-bottom: 1px solid rgba(255,255,255,0.06);
   padding-bottom: 0.5rem;
 }
+
+.ref-wrapper {
+  position: relative;
+}
+.ref-grid-wrap {
+  max-height: 340px;
+  overflow: hidden;
+  transition: max-height 0.8s cubic-bezier(0.16,1,0.3,1);
+}
+.ref-grid-wrap.expanded {
+  max-height: 2000px;
+}
+.ref-fade {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 140px;
+  background: linear-gradient(to bottom, rgba(10,10,10,0) 0%, rgba(10,10,10,0.8) 50%, var(--dark) 100%);
+  pointer-events: none;
+  transition: opacity 0.5s;
+}
+.ref-grid-wrap.expanded ~ .ref-fade {
+  opacity: 0;
+  visibility: hidden;
+}
+.ref-action {
+  text-align: center;
+  margin-top: 1.5rem;
+}
 .ref-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -848,18 +876,28 @@ body::after{
 
     <div class="ref-year d2" data-reveal>2025</div>
 
-    <div class="ref-grid d3" data-reveal>
-      <div class="ref-item">Kappensitzung Niedersalbach</div>
-      <div class="ref-item">Handball Dorfcup HWE Erbach Waldmohr</div>
-      <div class="ref-item">Unser Dorf spielt Fußball SC Wemmatia Wemmetsweiler e.V.</div>
-      <div class="ref-item">Summer in the City St. Wendel</div>
-      <div class="ref-item">Kirmes Marth</div>
-      <div class="ref-item">Oktoberfest Lebach</div>
-      <div class="ref-item">Rock am Wacken Mountain</div>
-      <div class="ref-item">Feuerwehrfest Wiesbach</div>
-      <div class="ref-item">Rock an de Kerch Wellesweiler</div>
-      <div class="ref-item">Diverse Hochzeiten & Firmenfeiern</div>
+    <div class="ref-wrapper d3" data-reveal>
+      <div class="ref-grid-wrap" id="refGridWrap">
+        <div class="ref-grid">
+          <div class="ref-item">Kappensitzung Niedersalbach</div>
+          <div class="ref-item">Handball Dorfcup HWE Erbach Waldmohr</div>
+          <div class="ref-item">Unser Dorf spielt Fußball SC Wemmatia Wemmetsweiler e.V.</div>
+          <div class="ref-item">Summer in the City St. Wendel</div>
+          <div class="ref-item">Kirmes Marth</div>
+          <div class="ref-item">Oktoberfest Lebach</div>
+          <div class="ref-item">Rock am Wacken Mountain</div>
+          <div class="ref-item">Feuerwehrfest Wiesbach</div>
+          <div class="ref-item">Rock an de Kerch Wellesweiler</div>
+          <div class="ref-item">Diverse Hochzeiten & Firmenfeiern</div>
+        </div>
+      </div>
+      <div class="ref-fade" id="refFade"></div>
     </div>
+
+    <div class="ref-action d4" data-reveal>
+      <button class="btn btn-ghost" id="refToggleBtn">Alle anzeigen ↓</button>
+    </div>
+
   </div>
 </section>
 
@@ -1130,6 +1168,28 @@ document.querySelectorAll('.about-highlight-num').forEach(el => {
   }, { threshold: 0.5 });
   obs.observe(el);
 });
+/*═══ REFERENCES EXPAND ═══*/
+const refToggleBtn = document.getElementById('refToggleBtn');
+const refGridWrap = document.getElementById('refGridWrap');
+
+if (refToggleBtn && refGridWrap) {
+  refToggleBtn.addEventListener('click', () => {
+    const isExpanded = refGridWrap.classList.contains('expanded');
+
+    if (isExpanded) {
+      refGridWrap.classList.remove('expanded');
+      refToggleBtn.textContent = 'Alle anzeigen ↓';
+
+      const sectionTop = document.getElementById('referenzen').offsetTop;
+      if (window.scrollY > sectionTop + 150) {
+        window.scrollTo({ top: sectionTop + 50, behavior: 'smooth' });
+      }
+    } else {
+      refGridWrap.classList.add('expanded');
+      refToggleBtn.textContent = 'Weniger anzeigen ↑';
+    }
+  });
+}
 </script>
 </body>
 </html>

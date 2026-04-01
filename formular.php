@@ -3,7 +3,7 @@
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // --- 1. reCAPTCHA VERIFIZIERUNG ---
-    $recaptcha_secret = "DEIN_GEHEIMER_SCHLUESSEL_HIER_EINTRAGEN";
+    $recaptcha_secret = "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe";
     $recaptcha_response = $_POST['g-recaptcha-response'] ?? '';
 
     // Prüfen, ob das Captcha überhaupt angeklickt wurde

@@ -222,7 +222,7 @@ body::after{
 }
 .hero-logo img{
   width:100%;height:auto;
-  
+
 }
 /* SVG text fallback logo */
 .hero-logo-svg{
@@ -1336,10 +1336,38 @@ document.getElementById('modal').addEventListener('click',e=>{if(e.target===e.cu
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 
 /*═══ COUNTER ANIMATION ═══*/
-document.querySelectorAll('.about-highlight-num').forEach(el=>{
-  const obs=new IntersectionObserver(entries=>{
-    entries.forEach(entry=>{
-      if(!entry.isIntersecting)return;
-      const txt=el.textContent;
-      if(txt==='∞')return;
-      con
+document.querySelectorAll('.about-highlight-num').forEach(el => {
+  const targetText = el.textContent;
+  if (targetText === '∞') return;
+
+  const target = parseInt(targetText);
+  if (isNaN(target)) return;
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        let current = 0;
+        const duration = 1200; // Dauer der Animation in ms
+        const steps = 30;
+        const stepValue = target / steps;
+        const interval = duration / steps;
+
+        const timer = setInterval(() => {
+          current += stepValue;
+          if (current >= target) {
+            el.textContent = targetText; // Setzt Originaltext inkl. "+" zurück
+            clearInterval(timer);
+          } else {
+            el.textContent = Math.floor(current) + (targetText.includes('+') ? '+' : '');
+          }
+        }, interval);
+
+        obs.unobserve(el);
+      }
+    });
+  }, { threshold: 0.5 });
+  obs.observe(el);
+});
+</script>
+</body>
+</html>

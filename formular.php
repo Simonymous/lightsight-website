@@ -2,8 +2,12 @@
 // Nur POST-Anfragen erlauben
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
+    // Konfiguration laden
+    // config.php wird nicht in Github getracked, um das Secret nicht zu leaken!
+    $config = include('config.php');
+
     // --- 1. reCAPTCHA VERIFIZIERUNG ---
-    $recaptcha_secret = "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe";
+    $recaptcha_secret = $config['recaptcha_secret'];
     $recaptcha_response = $_POST['g-recaptcha-response'] ?? '';
 
     // Prüfen, ob das Captcha überhaupt angeklickt wurde
